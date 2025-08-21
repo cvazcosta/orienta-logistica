@@ -1,22 +1,13 @@
 {
-  "builds": [
-    {
-      "src": "api/generate-map.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "rotas-hardcoded.json",
-      "use": "@vercel/static"
+  "functions": {
+    "api/generate-map.py": {
+      "runtime": "python3.9"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/generate-map",
-      "dest": "/api/generate-map.py"
+      "dest": "/api/generate-map"
     },
     {
       "src": "/",

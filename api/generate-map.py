@@ -262,3 +262,8 @@ def health():
         'service': 'Route Visualizer API',
         'destination': visualizer.destination
     })
+
+# Função handler para Vercel (ponto de entrada da função serverless)
+def handler(request):
+    """Função handler para Vercel - ponto de entrada da função serverless"""
+    return app(request.environ, lambda status, headers: None)
