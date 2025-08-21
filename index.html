@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Rotas - Biopark</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            background: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: left;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            font-size: 1.5em;
+            margin-bottom: 3px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.8em;
+        }
+
+        .header-stats {
+            display: none;
+            gap: 15px;
+        }
+
+        .header-stats.visible {
+            display: flex;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-align: center;
+            min-width: 120px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card .stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #fff;
+            display: block;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.75em;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 0;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 1px solid #dee2e6;
+            overflow-y: auto; /* Adiciona rolagem vertical */
+            max-height: 100%; /* Limita a altura ao container pai */
+        }
+
+        .map-container {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            height: 100%; /* Ocupa toda a altura disponível */
+            position: sticky;
+            top: 0;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .origins-list {
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .origin-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .origin-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+
+        .origin-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-left {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .route-checkbox {
+            margin-right: 10px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .origin-name {
+            font-weight: 600;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .origin-name:hover {
+            color: #667eea;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .info-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .info-btn:hover {
+            background: #138496;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .map-placeholder {
+            text-align: center;
+            color: #6c757d;
+            padding: 60px;
+        }
+
+        .map-placeholder i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #mapContainer {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 500px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-title {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            line-height: 1.6;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .filters-section {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .filters-title {
+            color: #495057;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .filter-control-btn {
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border: 1px solid #dee2e6;
+            background: #f8f9fa;
+            color: #6c757d;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-control-btn:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .filter-options {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background: white;
+            padding: 8px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.85em;
+        }
+
+        .filter-option input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .filter-option label {
+            cursor: pointer;
+            color: #495057;
+            flex: 1;
+        }
+
+        .filter-option:hover {
+            background: #f8f9fa;
+            border-radius: 3px;
+        }
+
+        .filter-option.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .filter-option input[type="checkbox"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .filter-option.disabled label {
+            cursor: not-allowed;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                height: auto;
+                overflow: visible;
+            }
+            
+            .sidebar {
+                max-height: 500px;
+                overflow-y: auto;
+                order: 2;
+            }
+            
+            .map-container {
+                order: 1;
+                min-height: 400px;
+                position: relative;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>🗺️ Visualizador de Rotas</h1>
+                <p>Destino: Biopark Educação - Toledo, PR</p>
+            </div>
+            <div class="header-stats" id="headerStats">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalStudents">0</span>
+                    <span class="stat-label">Total de Alunos</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="totalSchools">0</span>
+                    <span class="stat-label">Total de Escolas</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="sidebar">
+                <div class="form-section">
+                    <h3>Pontos de Origem (<span id="originCount">0</span>)</h3>
+                    
+                    <!-- Seção de Filtros -->
+                    <div class="filters-section">
+                        <div class="filters-title">
+                            🔍 Filtros
+                        </div>
+                        <div class="filters-grid">
+                            <div class="filter-group">
+                                <div class="filter-group-title">
+                                    Turnos
+                                    <div class="filter-controls">
+                                        <button class="filter-control-btn" onclick="selectAllTurnos()">Todos</button>
+                                        <button class="filter-control-btn" onclick="clearAllTurnos()">Limpar</button>
+                                    </div>
+                                </div>
+                                <div class="filter-options" id="turnoOptions">
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="turno-manha" value="Manhã" onchange="applyFilters()">
+                                        <label for="turno-manha">Manhã</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="turno-integral" value="Integral" onchange="applyFilters()">
+                                        <label for="turno-integral">Integral</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="turno-tarde" value="Tarde" onchange="applyFilters()">
+                                        <label for="turno-tarde">Tarde</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="turno-noite" value="Noite" onchange="applyFilters()">
+                                        <label for="turno-noite">Noite</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <div class="filter-group-title">
+                                    Cidades
+                                    <div class="filter-controls">
+                                        <button class="filter-control-btn" onclick="selectAllCidades()">Todas</button>
+                                        <button class="filter-control-btn" onclick="clearAllCidades()">Limpar</button>
+                                    </div>
+                                </div>
+                                <div class="filter-options" id="cidadeOptions">
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-ampere" value="Ampére" onchange="applyFilters()">
+                                        <label for="cidade-ampere">Ampére</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-assis" value="Assis" onchange="applyFilters()">
+                                        <label for="cidade-assis">Assis</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-cafelandia" value="Cafelândia" onchange="applyFilters()">
+                                        <label for="cidade-cafelandia">Cafelândia</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-capanema" value="Capanema" onchange="applyFilters()">
+                                        <label for="cidade-capanema">Capanema</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-cascavel" value="Cascavel" onchange="applyFilters()">
+                                        <label for="cidade-cascavel">Cascavel</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-ceu-azul" value="Céu Azul" onchange="applyFilters()">
+                                        <label for="cidade-ceu-azul">Céu Azul</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-formosa" value="Formosa do Oeste" onchange="applyFilters()">
+                                        <label for="cidade-formosa">Formosa do Oeste</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-goioere" value="Goioerê" onchange="applyFilters()">
+                                        <label for="cidade-goioere">Goioerê</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-jesuitas" value="Jesuítas" onchange="applyFilters()">
+                                        <label for="cidade-jesuitas">Jesuítas</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-marechal" value="Marechal Rondon" onchange="applyFilters()">
+                                        <label for="cidade-marechal">Marechal Rondon</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-maripa" value="Maripá" onchange="applyFilters()">
+                                        <label for="cidade-maripa">Maripá</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-ouro-verde" value="Ouro Verde" onchange="applyFilters()">
+                                        <label for="cidade-ouro-verde">Ouro Verde</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-palotina" value="Palotina" onchange="applyFilters()">
+                                        <label for="cidade-palotina">Palotina</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-quarto-centenario" value="Quarto Centenário" onchange="applyFilters()">
+                                        <label for="cidade-quarto-centenario">Quarto Centenário</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-quatro-pontes" value="Quatro Pontes" onchange="applyFilters()">
+                                        <label for="cidade-quatro-pontes">Quatro Pontes</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-realeza" value="Realeza" onchange="applyFilters()">
+                                        <label for="cidade-realeza">Realeza</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-terra-roxa" value="Terra Roxa" onchange="applyFilters()">
+                                        <label for="cidade-terra-roxa">Terra Roxa</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-toledo" value="Toledo" onchange="applyFilters()">
+                                        <label for="cidade-toledo">Toledo</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-tupassi" value="Tupãssi" onchange="applyFilters()">
+                                        <label for="cidade-tupassi">Tupãssi</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="cidade-vera-cruz" value="Vera Cruz" onchange="applyFilters()">
+                                        <label for="cidade-vera-cruz">Vera Cruz</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="origins-list" id="originsList">
+                        <div class="map-placeholder">
+                            <span style="font-size: 2em;">📍</span>
+                            <p>Nenhum ponto adicionado ainda</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button class="btn" onclick="selectAllRoutes()" id="selectAllBtn" style="margin-right: 10px; width: auto; padding: 8px 16px; font-size: 12px;">Selecionar Todas</button>
+                        <button class="btn" onclick="deselectAllRoutes()" id="deselectAllBtn" style="width: auto; padding: 8px 16px; font-size: 12px; background: #6c757d;">Desmarcar Todas</button>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Adicionar Ponto de Origem</h3>
+                    
+                    <div class="input-group">
+                        <label for="inputType">Tipo de entrada:</label>
+                        <select id="inputType" onchange="toggleInputType()">
+                            <option value="address">Por endereço</option>
+                            <option value="coordinates">Por coordenadas</option>
+                        </select>
+                    </div>
+
+                    <div id="addressInputs">
+                        <div class="input-group">
+                            <label for="address">Endereço:</label>
+                            <input type="text" id="address" placeholder="Ex: Cascavel, PR">
+                        </div>
+                    </div>
+
+                    <div id="coordsInputs" style="display: none;">
+                        <div class="input-group">
+                            <label for="latitude">Latitude:</label>
+                            <input type="number" id="latitude" step="any" placeholder="Ex: -24.7856">
+                        </div>
+                        <div class="input-group">
+                            <label for="longitude">Longitude:</label>
+                            <input type="number" id="longitude" step="any" placeholder="Ex: -53.0982">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="originName">Nome do ponto:</label>
+                        <input type="text" id="originName" placeholder="Nome para identificar este ponto">
+                    </div>
+
+                    <button class="btn" onclick="addOrigin()">Adicionar Ponto</button>
+                    <div class="error" id="errorMsg"></div>
+                </div>
+
+                <div class="form-section">
+                    <button class="btn" onclick="generateMap()" id="generateBtn" disabled>
+                        Gerar Mapa de Rotas
+                    </button>
+                    <div class="loading" id="loading">
+                        <p>🔄 Gerando mapa...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-container">
+                <div class="map-placeholder" id="mapPlaceholder">
+                    <span style="font-size: 4em;">🗺️</span>
+                    <h3>Mapa será exibido aqui</h3>
+                    <p>Adicione pontos de origem e clique em "Gerar Mapa de Rotas"</p>
+                </div>
+                <div id="mapContainer" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para informações detalhadas -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Informações da Rota</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let origins = [];
+        let selectedRoutes = new Set(); // Para rastrear rotas selecionadas
+        let filteredOrigins = []; // Para armazenar origens filtradas
+        let activeFilters = { turnos: [], cidades: [] }; // Filtros ativos
+
+        function toggleInputType() {
+            const inputType = document.getElementById('inputType').value;
+            const addressInputs = document.getElementById('addressInputs');
+            const coordsInputs = document.getElementById('coordsInputs');
+            
+            if (inputType === 'address') {
+                addressInputs.style.display = 'block';
+                coordsInputs.style.display = 'none';
+            } else {
+                addressInputs.style.display = 'none';
+                coordsInputs.style.display = 'block';
+            }
+            
+            clearError();
+        }
+
+        function clearError() {
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function addOrigin() {
+            clearError();
+            
+            const inputType = document.getElementById('inputType').value;
+            const originName = document.getElementById('originName').value.trim();
+            
+            if (!originName) {
+                showError('Por favor, informe um nome para o ponto');
+                return;
+            }
+            
+            let origin = { name: originName };
+            
+            if (inputType === 'address') {
+                const address = document.getElementById('address').value.trim();
+                if (!address) {
+                    showError('Por favor, informe o endereço');
+                    return;
+                }
+                origin.address = address;
+                origin.type = 'address';
+            } else {
+                const lat = parseFloat(document.getElementById('latitude').value);
+                const lon = parseFloat(document.getElementById('longitude').value);
+                
+                if (isNaN(lat) || isNaN(lon)) {
+                    showError('Por favor, informe coordenadas válidas');
+                    return;
+                }
+                
+                origin.lat = lat;
+                origin.lon = lon;
+                origin.type = 'coordinates';
+            }
+            
+            origins.push(origin);
+            updateOriginsList();
+            clearForm();
+            updateGenerateButton();
+        }
+
+        function removeOrigin(index) {
+            origins.splice(index, 1);
+            // Atualiza os índices das rotas selecionadas
+            const newSelectedRoutes = new Set();
+            selectedRoutes.forEach(selectedIndex => {
+                if (selectedIndex < index) {
+                    newSelectedRoutes.add(selectedIndex);
+                } else if (selectedIndex > index) {
+                    newSelectedRoutes.add(selectedIndex - 1);
+                }
+                // Se selectedIndex === index, não adiciona (remove a seleção)
+            });
+            selectedRoutes = newSelectedRoutes;
+            updateOriginsList();
+            updateGenerateButton();
+        }
+
+        // Função para obter cidades disponíveis baseadas nos turnos selecionados
+        function getAvailableCities(selectedTurnos) {
+            if (selectedTurnos.length === 0) {
+                // Se nenhum turno selecionado, retorna todas as cidades
+                const allCities = new Set();
+                origins.forEach(origin => {
+                    const cityName = origin.name.split(' - ')[0];
+                    allCities.add(cityName);
+                });
+                return Array.from(allCities).sort();
+            }
+            
+            const availableCities = new Set();
+            origins.forEach(origin => {
+                if (origin.info && selectedTurnos.includes(origin.info.turno)) {
+                    const cityName = origin.name.split(' - ')[0];
+                    availableCities.add(cityName);
+                }
+            });
+            return Array.from(availableCities).sort();
+        }
+        
+        // Função para obter turnos disponíveis baseados nas cidades selecionadas
+        function getAvailableShifts(selectedCidades) {
+            if (selectedCidades.length === 0) {
+                // Se nenhuma cidade selecionada, retorna todos os turnos
+                const allShifts = new Set();
+                origins.forEach(origin => {
+                    if (origin.info && origin.info.turno) {
+                        allShifts.add(origin.info.turno);
+                    }
+                });
+                return Array.from(allShifts).sort();
+            }
+            
+            const availableShifts = new Set();
+            origins.forEach(origin => {
+                const cityName = origin.name.split(' - ')[0];
+                if (selectedCidades.includes(cityName) && origin.info && origin.info.turno) {
+                    availableShifts.add(origin.info.turno);
+                }
+            });
+            return Array.from(availableShifts).sort();
+        }
+        
+        // Função para atualizar as opções disponíveis nos filtros
+        function updateFilterOptions() {
+            const selectedTurnos = activeFilters.turnos;
+            const selectedCidades = activeFilters.cidades;
+            
+            // Atualizar opções de cidades baseadas nos turnos selecionados
+            const availableCities = getAvailableCities(selectedTurnos);
+            const cidadeCheckboxes = document.querySelectorAll('#cidadeOptions input[type="checkbox"]');
+            cidadeCheckboxes.forEach(checkbox => {
+                const isAvailable = availableCities.includes(checkbox.value);
+                checkbox.disabled = !isAvailable;
+                
+                // Atualizar classes CSS
+                if (isAvailable) {
+                    checkbox.parentElement.classList.remove('disabled');
+                } else {
+                    checkbox.parentElement.classList.add('disabled');
+                }
+                
+                // Se a cidade não está mais disponível e estava selecionada, desmarca
+                if (!isAvailable && checkbox.checked) {
+                    checkbox.checked = false;
+                }
+            });
+            
+            // Atualizar opções de turnos baseadas nas cidades selecionadas
+            const availableShifts = getAvailableShifts(selectedCidades);
+            const turnoCheckboxes = document.querySelectorAll('#turnoOptions input[type="checkbox"]');
+            turnoCheckboxes.forEach(checkbox => {
+                const isAvailable = availableShifts.includes(checkbox.value);
+                checkbox.disabled = !isAvailable;
+                
+                // Atualizar classes CSS
+                if (isAvailable) {
+                    checkbox.parentElement.classList.remove('disabled');
+                } else {
+                    checkbox.parentElement.classList.add('disabled');
+                }
+                
+                // Se o turno não está mais disponível e estava selecionado, desmarca
+                if (!isAvailable && checkbox.checked) {
+                    checkbox.checked = false;
+                }
+            });
+        }
+
+        function applyFilters() {
+            // Coletar turnos selecionados
+            const turnoCheckboxes = document.querySelectorAll('#turnoOptions input[type="checkbox"]:checked');
+            activeFilters.turnos = Array.from(turnoCheckboxes).map(cb => cb.value);
+            
+            // Coletar cidades selecionadas
+            const cidadeCheckboxes = document.querySelectorAll('#cidadeOptions input[type="checkbox"]:checked');
+            activeFilters.cidades = Array.from(cidadeCheckboxes).map(cb => cb.value);
+            
+            // Atualizar opções disponíveis nos filtros
+            updateFilterOptions();
+            
+            // Filtra as origens baseado nos filtros selecionados
+            filteredOrigins = origins.filter((origin, index) => {
+                let matchesTurno = true;
+                let matchesCidade = true;
+                
+                // Filtro por turno
+                if (activeFilters.turnos.length > 0 && origin.info && origin.info.turno) {
+                    matchesTurno = activeFilters.turnos.includes(origin.info.turno);
+                }
+                
+                // Filtro por cidade - verifica no nome da origem ou no endereço
+                if (activeFilters.cidades.length > 0) {
+                    const cityInName = activeFilters.cidades.some(cidade => 
+                        origin.name.toLowerCase().includes(cidade.toLowerCase()));
+                    const cityInAddress = origin.address && activeFilters.cidades.some(cidade => 
+                        origin.address.toLowerCase().includes(cidade.toLowerCase()));
+                    matchesCidade = cityInName || cityInAddress;
+                }
+                
+                return matchesTurno && matchesCidade;
+            });
+            
+            updateOriginsList();
+        }
+        
+        // Funções de controle para turnos
+        function selectAllTurnos() {
+            const checkboxes = document.querySelectorAll('#turnoOptions input[type="checkbox"]:not(:disabled)');
+            checkboxes.forEach(cb => cb.checked = true);
+            applyFilters();
+        }
+
+        function clearAllTurnos() {
+            const checkboxes = document.querySelectorAll('#turnoOptions input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            applyFilters();
+        }
+
+        // Funções de controle para cidades
+        function selectAllCidades() {
+            const checkboxes = document.querySelectorAll('#cidadeOptions input[type="checkbox"]:not(:disabled)');
+            checkboxes.forEach(cb => cb.checked = true);
+            applyFilters();
+        }
+
+        function clearAllCidades() {
+            const checkboxes = document.querySelectorAll('#cidadeOptions input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            applyFilters();
+        }
+        
+        function updateOriginsList() {
+            const listContainer = document.getElementById('originsList');
+            const countSpan = document.getElementById('originCount');
+            
+            // Usa filteredOrigins se houver filtros ativos, senão usa origins
+            const displayOrigins = (activeFilters.turnos.length > 0 || activeFilters.cidades.length > 0) ? filteredOrigins : origins;
+            const totalOrigins = origins.length;
+            const filteredCount = displayOrigins.length;
+            
+            // Atualiza o contador
+            if (activeFilters.turnos.length > 0 || activeFilters.cidades.length > 0) {
+                countSpan.textContent = `${filteredCount}/${totalOrigins}`;
+            } else {
+                countSpan.textContent = totalOrigins;
+            }
+            
+            if (displayOrigins.length === 0) {
+                const message = (activeFilters.turnos.length > 0 || activeFilters.cidades.length > 0) ? 
+                    'Nenhum ponto encontrado com os filtros aplicados' : 
+                    'Nenhum ponto adicionado ainda';
+                listContainer.innerHTML = `
+                    <div class="map-placeholder">
+                        <span style="font-size: 2em;">📍</span>
+                        <p>${message}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            listContainer.innerHTML = displayOrigins.map((origin) => {
+                // Encontra o índice original da origem
+                const originalIndex = origins.findIndex(o => o === origin);
+                return `
+                    <div class="origin-card ${selectedRoutes.has(originalIndex) ? 'selected' : ''}">
+                        <div class="card-header">
+                            <div class="card-left">
+                                <input type="checkbox" class="route-checkbox" 
+                                       ${selectedRoutes.has(originalIndex) ? 'checked' : ''}
+                                       onchange="toggleRoute(${originalIndex})">
+                                <span class="origin-name" onclick="showRouteInfo(${originalIndex})">
+                                     ${origin.name}${origin.info ? ` | ${origin.info.turno} | ${origin.info.passageiros} alunos` : ''}
+                                 </span>
+                            </div>
+                            <div class="card-actions">
+                                ${origin.info ? `<button class="info-btn" onclick="showRouteInfo(${originalIndex})">Info</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function clearForm() {
+            document.getElementById('address').value = '';
+            document.getElementById('latitude').value = '';
+            document.getElementById('longitude').value = '';
+            document.getElementById('originName').value = '';
+        }
+
+        function updateGenerateButton() {
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = selectedRoutes.size === 0;
+        }
+
+        // Função para calcular e atualizar as estatísticas do cabeçalho
+        function updateHeaderStats() {
+            const headerStats = document.getElementById('headerStats');
+            const totalStudentsEl = document.getElementById('totalStudents');
+            const totalSchoolsEl = document.getElementById('totalSchools');
+            
+            if (selectedRoutes.size === 0) {
+                headerStats.classList.remove('visible');
+                return;
+            }
+            
+            let totalStudents = 0;
+            let totalSchools = 0;
+            
+            // Calcula totais baseado nas rotas selecionadas
+            selectedRoutes.forEach(index => {
+                const origin = origins[index];
+                if (origin && origin.info) {
+                    // Soma o número de passageiros (alunos)
+                    if (origin.info.passageiros) {
+                        totalStudents += parseInt(origin.info.passageiros) || 0;
+                    }
+                    // Conta cada origem como uma escola
+                    totalSchools += 1;
+                }
+            });
+            
+            // Atualiza os valores nos cards
+            totalStudentsEl.textContent = totalStudents;
+            totalSchoolsEl.textContent = totalSchools;
+            
+            // Mostra os cards
+            headerStats.classList.add('visible');
+        }
+        
+        function toggleRoute(index) {
+            if (selectedRoutes.has(index)) {
+                selectedRoutes.delete(index);
+            } else {
+                selectedRoutes.add(index);
+            }
+            updateOriginsList();
+            updateGenerateButton();
+            updateHeaderStats();
+        }
+        
+        function selectAllRoutes() {
+            selectedRoutes.clear();
+            // Seleciona apenas as rotas visíveis (filtradas)
+            const displayOrigins = (activeFilters.turnos.length > 0 || activeFilters.cidades.length > 0) ? filteredOrigins : origins;
+            displayOrigins.forEach(origin => {
+                const originalIndex = origins.findIndex(o => o === origin);
+                selectedRoutes.add(originalIndex);
+            });
+            updateOriginsList();
+            updateGenerateButton();
+            updateHeaderStats();
+        }
+        
+        function deselectAllRoutes() {
+            // Desmarca apenas as rotas visíveis (filtradas)
+            const displayOrigins = (activeFilters.turnos.length > 0 || activeFilters.cidades.length > 0) ? filteredOrigins : origins;
+            displayOrigins.forEach(origin => {
+                const originalIndex = origins.findIndex(o => o === origin);
+                selectedRoutes.delete(originalIndex);
+            });
+            updateOriginsList();
+            updateGenerateButton();
+            updateHeaderStats();
+        }
+        
+        function showRouteInfo(index) {
+            const origin = origins[index];
+            const modal = document.getElementById('infoModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = origin.name;
+            
+            let infoHtml = `
+                <div class="info-item">
+                    <span class="info-label">Localização:</span><br>
+                    ${origin.type === 'address' ? 
+                        `📍 ${origin.address}` : 
+                        `📍 Coordenadas: ${origin.lat.toFixed(4)}, ${origin.lon.toFixed(4)}`
+                    }
+                </div>
+            `;
+            
+            if (origin.info) {
+                infoHtml += `
+                    <div class="info-item">
+                        <span class="info-label">Data:</span><br>
+                        ${origin.info.data}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Horário de Saída:</span><br>
+                        ${origin.info.horarioSaida}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Horário de Retorno:</span><br>
+                        ${origin.info.horarioRetorno}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Número de Passageiros:</span><br>
+                        ${origin.info.passageiros}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Turno:</span><br>
+                        ${origin.info.turno}
+                    </div>
+                `;
+            }
+            
+            modalBody.innerHTML = infoHtml;
+            modal.style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+        
+        // Fecha modal ao clicar fora dele
+        window.onclick = function(event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        async function generateMap() {
+            if (selectedRoutes.size === 0) {
+                showError('Selecione pelo menos uma rota para gerar o mapa.');
+                return;
+            }
+            
+            const loading = document.getElementById('loading');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            loading.style.display = 'block';
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Gerando...';
+            
+            try {
+                // Filtra apenas as rotas selecionadas
+                const selectedOrigins = origins.filter((_, index) => selectedRoutes.has(index));
+                
+                const response = await fetch('http://localhost:5000/generate-map', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        origins: selectedOrigins
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erro ao gerar mapa');
+                }
+                
+                const result = await response.json();
+                displayMap(result.mapHtml);
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showError('Erro ao gerar mapa. Verifique se o servidor está rodando.');
+            } finally {
+                loading.style.display = 'none';
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Gerar Mapa de Rotas';
+            }
+        }
+
+        function displayMap(mapHtml) {
+            const placeholder = document.getElementById('mapPlaceholder');
+            const mapContainer = document.getElementById('mapContainer');
+            
+            placeholder.style.display = 'none';
+            mapContainer.style.display = 'block';
+            mapContainer.innerHTML = mapHtml;
+        }
+
+        // Função para carregar dados das rotas do arquivo JSON
+        async function loadRoutesFromFile() {
+            try {
+                const response = await fetch('./rotas-hardcoded.json');
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar arquivo de rotas');
+                }
+                const routes = await response.json();
+                return routes;
+            } catch (error) {
+                console.error('Erro ao carregar rotas:', error);
+                return [];
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Carrega os dados do arquivo JSON
+            const routesData = await loadRoutesFromFile();
+            
+            // Converte os dados para o formato esperado
+            origins = routesData.map(route => ({
+                name: route.name,
+                lat: route.lat || null,
+                lon: route.lon || null,
+                address: route.address || null,
+                type: route.type,
+                info: route.info
+            }));
+            
+            // Atualiza a lista de origens
+            updateOriginsList();
+            updateGenerateButton();
+            
+            // Não gera o mapa automaticamente - usuário deve selecionar rotas
+        });
+    </script>
+</body>
+</html>

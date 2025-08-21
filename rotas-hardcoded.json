@@ -1,0 +1,860 @@
+[
+    {
+        "name": "Céu Azul - Monteiro Lobato",
+        "lat": -25.1453537282217000,
+        "lon": -53.8473595533506000,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 32,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Vera Cruz - Vital Brasil",
+        "lat": -25.0590752747358000,
+        "lon": -53.8776891874423000,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 25,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Vera Cruz - Marquês de Paranaguá",
+        "lat": -25.06848331,
+        "lon": -53.8790696,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 10,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Realeza - 12 de Novembro",
+        "lat": -25.7721241,
+        "lon": -53.5331429,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 87,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Realeza - João Paulo II",
+        "lat": -25.77048802,
+        "lon": -53.52273227,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 28,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Realeza - Dom Carlos Eduardo",
+        "lat": -25.77495204,
+        "lon": -53.53392746,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 16,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Realeza - Escola Campo Flor da Serra",
+        "lat": -25.6182382,
+        "lon": -53.55863094,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 15,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Palotina - Barão do Rio Branco",
+        "lat": -24.28481769,
+        "lon": -53.83437784,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 80,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Palotina - CEEDUC",
+        "lat": -24.28004398,
+        "lon": -53.84194233,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 30,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Palotina - Terra do Saber",
+        "lat": -24.294889,
+        "lon": -53.83792896,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 8,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Terra Roxa - Estadual Arthur da Costa e Silva",
+        "lat": -24.16728704,
+        "lon": -54.09947654,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 56,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Terra Roxa - CEEP Paulo Renato Souza",
+        "lat": -24.15738708,
+        "lon": -54.10297738,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 35,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Terra Roxa - Antonio Carlos Gomes",
+        "lat": -24.17135695,
+        "lon": -54.09582441,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 8,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Goioerê - IFPR Goioerê",
+        "lat": -24.18350135,
+        "lon": -53.04704047,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 61,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Jesuítas - Humberto Alencar Castelo Branco",
+        "lat": -24.37913789,
+        "lon": -53.38164855,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 33,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Jesuítas - Barão do Rio Branco",
+        "lat": -24.4635212,
+        "lon": -53.41839349,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 19,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Cafelândia - Maria Destéfani Griggio",
+        "lat": -24.62944742,
+        "lon": -53.30805399,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 45,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Formosa do Oeste - Rui Barbosa",
+        "lat": -24.2962409,
+        "lon": -53.31590579,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 35,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Ampére - SESI",
+        "lat": -25.91044547,
+        "lon": -53.47406754,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 25,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Capanema - SESI",
+        "lat": -25.67241065,
+        "lon": -53.80136038,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 21,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Tupãssi - Heitor Cavalcante Alencar Furtado",
+        "lat": -24.64212203,
+        "lon": -53.46556779,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 12,
+            "turno": "Integral"
+        }
+    },
+    {
+        "name": "Quarto Centenário - IV Centenário",
+        "lat": -24.28064168,
+        "lon": -53.07459351,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "16:00",
+            "passageiros": 5,
+            "turno": "Integral"
+        }
+    },
+        {
+        "name": "Toledo - Dario Vellozo",
+        "lat": -24.72141389,
+        "lon": -53.73992865,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 107,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Antonio José Reis",
+        "lat": -24.76647471,
+        "lon": -53.73393798,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 72,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Luiz Augusto Morais Rego",
+        "lat": -24.73560822,
+        "lon": -53.74047659,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 70,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Ayrton Senna",
+        "lat": -24.76150776,
+        "lon": -53.74121378,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 66,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Jardim Maracanã",
+        "lat": -24.74937738,
+        "lon": -53.71784542,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 55,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Novo Horizonte",
+        "lat": -24.71085185,
+        "lon": -53.76713745,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 43,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Jardim Porto Alegre",
+        "lat": -24.72147208,
+        "lon": -53.72296067,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 22,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Esperança Favaretto Covatti",
+        "lat": -24.75005541,
+        "lon": -53.73740284,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 21,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Augustinho Donin",
+        "lat": -24.7239227,
+        "lon": -53.71277641,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 18,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - João Arnaldo Ritt - Vila Nova",
+        "lat": -24.57504435,
+        "lon": -53.80035753,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 18,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Senador Atílio Fontana",
+        "lat": -24.74476582,
+        "lon": -53.72666323,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 18,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Toledo - Jardim Europa",
+        "lat": -24.73844853,
+        "lon": -53.70530537,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 16,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Cascavel - Wilson Joffre",
+        "lat": -24.95661943,
+        "lon": -53.4514124,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 162,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Cascavel - Padre Carmelo Perrone",
+        "lat": -24.96323191,
+        "lon": -53.48108181,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 90,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Cascavel - Brasmadeira",
+        "lat": -24.92865703,
+        "lon": -53.43802789,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 77,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Cascavel - Marcos Cláudio Schuster",
+        "lat": -24.93971433,
+        "lon": -53.41338733,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 27,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Cascavel - Marista",
+        "lat": -24.95155742,
+        "lon": -53.41357372,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 21,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Cascavel - Jardim Interlagos",
+        "lat": -24.91257672,
+        "lon": -53.43612806,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 16,
+            "turno": "Manhã"
+        }
+    },
+        {
+        "name": "Assis Chateaubriand - Chateaubriandense",
+        "lat": -24.40296203,
+        "lon": -53.5115449,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 119,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Assis Chateaubriand - IFPR Assis",
+        "lat": -24.40251709,
+        "lon": -53.50662117,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 82,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Assis Chateaubriand - Guimarães Rosa",
+        "lat": -24.4037171,
+        "lon": -53.5099706,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 41,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Assis Chateaubriand - Teotônio Vilela",
+        "lat": -24.39580353,
+        "lon": -53.51544295,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 19,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Assis Chateaubriand - Padre Anchieta",
+        "lat": -24.40734482,
+        "lon": -53.52133649,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 15,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Marechal Rondon - Eron Domingues",
+        "lat": -24.55223409,
+        "lon": -54.06003107,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 106,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Marechal Rondon - Frentino Sackser",
+        "lat": -24.53114859,
+        "lon": -54.05181487,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 68,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Marechal Rondon - Martin Luther",
+        "lat": -24.55612753,
+        "lon": -54.05593606,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 27,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Marechal Rondon - Estadual Marechal Rondon",
+        "lat": -24.57116452,
+        "lon": -54.04874256,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 22,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Marechal Rondon - Campo Margarida",
+        "lat": -24.6483407,
+        "lon": -54.12462762,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 20,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Marechal Rondon - Maximiliano Ceretta",
+        "lat": -24.55812001,
+        "lon": -54.04843688,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 6,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Maripá - Pio XII",
+        "lat": -24.42116411,
+        "lon": -53.82908073,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 31,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Maripá - Castro Alves - Pérola Independente",
+        "lat": -24.53170259,
+        "lon": -53.73610272,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 14,
+            "turno": "Manhã"
+        }
+    },
+    {
+        "name": "Quatro Pontes - Estadual Quatro Pontes",
+        "lat": -24.57364358,
+        "lon": -53.97552082,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "07:30",
+            "horarioRetorno": "11:00",
+            "passageiros": 31,
+            "turno": "Manhã"
+        }
+    },
+        {
+        "name": "Ouro Verde - Estadual de Ouro Verde",
+        "lat": -24.77196715,
+        "lon": -53.90386223,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "13:00",
+            "horarioRetorno": "16:00",
+            "passageiros": 33,
+            "turno": "Tarde"
+        }
+    },
+    {
+        "name": "Marechal Rondon - Eron Domingues",
+        "lat": -24.55223409,
+        "lon": -54.06003107,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "13:00",
+            "horarioRetorno": "16:00",
+            "passageiros": 14,
+            "turno": "Tarde"
+        }
+    },
+    {
+        "name": "Marechal Rondon - Monteiro Lobato",
+        "lat": -24.53901155,
+        "lon": -54.03715159,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "13:00",
+            "horarioRetorno": "16:00",
+            "passageiros": 9,
+            "turno": "Tarde"
+        }
+    },
+    {
+        "name": "Assis Chateaubriand - Chateaubriandense",
+        "lat": -24.40296203,
+        "lon": -53.5115449,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "13:00",
+            "horarioRetorno": "16:00",
+            "passageiros": 20,
+            "turno": "Tarde"
+        }
+    },
+    {
+        "name": "Toledo - Dario Vellozo",
+        "lat": -24.72141389,
+        "lon": -53.73992865,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "13:00",
+            "horarioRetorno": "16:00",
+            "passageiros": 20,
+            "turno": "Tarde"
+        }
+    },
+    {
+        "name": "Toledo - Jardim Europa",
+        "lat": -24.73844853,
+        "lon": -53.70530537,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "19:00",
+            "horarioRetorno": "21:00",
+            "passageiros": 56,
+            "turno": "Noite"
+        }
+    },
+    {
+        "name": "Toledo - Francisco Galdino de Lima",
+        "lat": -24.70901064,
+        "lon": -53.74693084,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "19:00",
+            "horarioRetorno": "21:00",
+            "passageiros": 41,
+            "turno": "Noite"
+        }
+    },
+    {
+        "name": "Toledo - Senador Atílio Fontana",
+        "lat": -24.74476582,
+        "lon": -53.72666323,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "19:00",
+            "horarioRetorno": "21:00",
+            "passageiros": 22,
+            "turno": "Noite"
+        }
+    },
+    {
+        "name": "Toledo - Jardim Porto Alegre",
+        "lat": -24.72147208,
+        "lon": -53.72296067,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "19:00",
+            "horarioRetorno": "21:00",
+            "passageiros": 8,
+            "turno": "Noite"
+        }
+    },
+    {
+        "name": "Marechal - Eron Domingues",
+        "lat": -24.55223409,
+        "lon": -54.06003107,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "19:00",
+            "horarioRetorno": "21:00",
+            "passageiros": 74,
+            "turno": "Noite"
+        }
+    },
+    {
+        "name": "Assis Chateaubriand - Chateaubriandense",
+        "lat": -24.40296203,
+        "lon": -53.5115449,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "19:00",
+            "horarioRetorno": "21:00",
+            "passageiros": 21,
+            "turno": "Noite"
+        }
+    },
+    {
+        "name": "Assis Chateaubriand - Estadual Bragantina",
+        "lat": -24.6133659,
+        "lon": -53.61675756,
+        "type": "coordinates",
+        "info": {
+            "data": "03/10/2025",
+            "horarioSaida": "19:00",
+            "horarioRetorno": "21:00",
+            "passageiros": 14,
+            "turno": "Noite"
+        }
+    }
+]
