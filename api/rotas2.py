@@ -207,6 +207,9 @@ def health():
 # Para Vercel, não precisamos das rotas de arquivos estáticos
 # O Vercel gerencia isso automaticamente
 
+# Para o Vercel, a aplicação Flask deve estar disponível no nível do módulo
+# A variável 'app' é automaticamente detectada pelo Vercel
+
 if __name__ == "__main__":
     # Instalar dependências necessárias:
     # pip install flask flask-cors folium requests

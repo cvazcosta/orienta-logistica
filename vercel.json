@@ -16,7 +16,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/rotas2.py"
+      "dest": "/api/$1"
     },
     {
       "src": "/",
