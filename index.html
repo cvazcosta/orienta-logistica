@@ -1195,7 +1195,7 @@
                 // Filtra apenas as rotas selecionadas
                 const selectedOrigins = origins.filter((_, index) => selectedRoutes.has(index));
                 
-                const response = await fetch('http://localhost:5000/generate-map', {
+                const response = await fetch('/api/generate-map', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
