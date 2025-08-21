@@ -156,38 +156,60 @@ class RouteVisualizer:
 # Instancia o visualizador
 visualizer = RouteVisualizer()
 
-def handler(request):
-    """Função handler para o Vercel"""
-    if request.method == 'POST':
-        try:
-            data = request.get_json()
-            
-            if not data or 'addresses' not in data:
-                return jsonify({
-                    'success': False,
-                    'error': 'Lista de endereços é obrigatória'
-                }), 400
-            
-            addresses = data['addresses']
-            
-            if not addresses or len(addresses) == 0:
-                return jsonify({
-                    'success': False,
-                    'error': 'Pelo menos um endereço deve ser fornecido'
-                }), 400
-            
-            origins = []
-            
-            for i, address in enumerate(addresses):
-                if not address.strip():
-                    continue
-                    
+@app.route('/generate-map', methods=['POST'])
+def generate_map():
+    """Endpoint para gerar mapa com rotas"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'origins' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Lista de origens é obrigatória'
+            }), 400
+        
+        origins_data = data['origins']
+        addresses = [origin['address'] for origin in origins_data]
+        
+        if not addresses or len(addresses) == 0:
+            return jsonify({
+                'success': False,
+                'error': 'Pelo menos um endereço deve ser fornecido'
+            }), 400
+        
+        origins = []
+        
+        for i, address in enumerate(addresses):
+            if not address.strip():
+                continue
+                
+            try:
+                # Geocodifica endereço
+                lat, lon = visualizer.geocode_address(address)
+                
+                # Calcula rota
+                route_info = visualizer.get_route(
+                    lat, lon,
+                    visualizer.destination['lat'], 
+                    visualizer.destination['lon']
+                )
+                
+                origin_data = {
+                    'address': address,
+                    'lat': lat,
+                    'lon': lon,
+                    'distance': route_info['distance'],
+                    'duration': route_info['duration'],
+                    'route_geometry': route_info['geometry']
+                }
+                
+                origins.append(origin_data)
+                
+            except Exception as e:
+                # Se falhar, adiciona sem rota
                 try:
-                    # Geocodifica endereço
                     lat, lon = visualizer.geocode_address(address)
-                    
-                    # Calcula rota
-                    route_info = visualizer.get_route(
+                    distance = visualizer.calculate_distance(
                         lat, lon,
                         visualizer.destination['lat'], 
                         visualizer.destination['lon']
@@ -197,73 +219,41 @@ def handler(request):
                         'address': address,
                         'lat': lat,
                         'lon': lon,
-                        'distance': route_info['distance'],
-                        'duration': route_info['duration'],
-                        'route_geometry': route_info['geometry']
+                        'distance': distance,
+                        'duration': distance * 1.5,  # Estimativa: 1.5 min por km
+                        'route_geometry': None,
+                        'error': f"Rota não disponível: {str(e)}"
                     }
                     
                     origins.append(origin_data)
                     
-                except Exception as e:
-                    # Se falhar, adiciona sem rota
-                    try:
-                        lat, lon = visualizer.geocode_address(address)
-                        distance = visualizer.calculate_distance(
-                            lat, lon,
-                            visualizer.destination['lat'], 
-                            visualizer.destination['lon']
-                        )
-                        
-                        origin_data = {
-                            'address': address,
-                            'lat': lat,
-                            'lon': lon,
-                            'distance': distance,
-                            'duration': distance * 1.5,  # Estimativa: 1.5 min por km
-                            'route_geometry': None,
-                            'error': f"Rota não disponível: {str(e)}"
-                        }
-                        
-                        origins.append(origin_data)
-                        
-                    except Exception as geo_error:
-                        return jsonify({
-                            'success': False,
-                            'error': f"Erro no endereço '{address}': {str(geo_error)}"
-                        }), 400
-            
-            if not origins:
-                return jsonify({
-                    'success': False,
-                    'error': 'Nenhum endereço válido foi processado'
-                }), 400
-            
-            # Gera mapa HTML
-            map_html = visualizer.create_map_html(origins)
-            
-            return jsonify({
-                'success': True,
-                'map_html': map_html,
-                'origins': origins,
-                'destination': visualizer.destination
-            })
-            
-        except Exception as e:
+                except Exception as geo_error:
+                    return jsonify({
+                        'success': False,
+                        'error': f"Erro no endereço '{address}': {str(geo_error)}"
+                    }), 400
+        
+        if not origins:
             return jsonify({
                 'success': False,
-                'error': f"Erro interno: {str(e)}"
-            }), 500
-    
-    else:
+                'error': 'Nenhum endereço válido foi processado'
+            }), 400
+        
+        # Gera mapa HTML
+        map_html = visualizer.create_map_html(origins)
+        
+        return jsonify({
+            'success': True,
+            'mapHtml': map_html,
+            'origins': origins,
+            'destination': visualizer.destination
+        })
+        
+    except Exception as e:
         return jsonify({
             'success': False,
-            'error': 'Método não permitido. Use POST.'
-        }), 405
-
-# Para compatibilidade com Flask local
-@app.route('/generate-map', methods=['POST'])
-def generate_map():
-    return handler(request)
+            'error': f"Erro interno: {str(e)}"
+        }), 500
 
 @app.route('/health', methods=['GET'])
 def health():
