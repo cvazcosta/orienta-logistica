@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import folium
@@ -204,13 +204,8 @@ def generate_map():
 def health():
     return jsonify({'status': 'API funcionando!'})
 
-@app.route('/')
-def serve_index():
-    return send_from_directory('..', 'index.html')
-
-@app.route('/<path:filename>')
-def serve_static(filename):
-    return send_from_directory('..', filename)
+# Para Vercel, não precisamos das rotas de arquivos estáticos
+# O Vercel gerencia isso automaticamente
 
 if __name__ == "__main__":
     # Instalar dependências necessárias:
