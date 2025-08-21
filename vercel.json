@@ -3,15 +3,5 @@
     "api/rotas2.py": {
       "runtime": "python3.9"
     }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/rotas2.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
+  }
 }
