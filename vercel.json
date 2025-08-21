@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "api/rotas2.py",
+      "src": "api/generate-map.py",
       "use": "@vercel/python"
     },
     {
