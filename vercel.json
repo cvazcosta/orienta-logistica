@@ -3,6 +3,14 @@
     {
       "src": "api/rotas2.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "rotas-hardcoded.json",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -11,7 +19,11 @@
       "dest": "/api/rotas2.py"
     },
     {
-      "src": "/(.*)",
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/(.*\\.(html|css|js|json|png|jpg|jpeg|gif|svg|ico))",
       "dest": "/$1"
     }
   ]
