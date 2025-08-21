@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+import os
 import folium
 import requests
 import json
@@ -202,6 +203,14 @@ def generate_map():
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'API funcionando!'})
+
+@app.route('/')
+def serve_index():
+    return send_from_directory('..', 'index.html')
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('..', filename)
 
 if __name__ == "__main__":
     # Instalar dependências necessárias:
