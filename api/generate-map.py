@@ -448,3 +448,17 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
+
+if __name__ == '__main__':
+    from http.server import HTTPServer
+    
+    port = 8000
+    server = HTTPServer(('localhost', port), handler)
+    print(f"Servidor rodando em http://localhost:{port}")
+    print("Pressione Ctrl+C para parar o servidor")
+    
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nServidor parado.")
+        server.shutdown()

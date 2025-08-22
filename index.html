@@ -127,31 +127,6 @@
             font-size: 1.3em;
         }
 
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        .input-group input:focus, .input-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -668,43 +643,7 @@
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h3>Adicionar Ponto de Origem</h3>
-                    
-                    <div class="input-group">
-                        <label for="inputType">Tipo de entrada:</label>
-                        <select id="inputType" onchange="toggleInputType()">
-                            <option value="address">Por endereço</option>
-                            <option value="coordinates">Por coordenadas</option>
-                        </select>
-                    </div>
 
-                    <div id="addressInputs">
-                        <div class="input-group">
-                            <label for="address">Endereço:</label>
-                            <input type="text" id="address" placeholder="Ex: Cascavel, PR">
-                        </div>
-                    </div>
-
-                    <div id="coordsInputs" style="display: none;">
-                        <div class="input-group">
-                            <label for="latitude">Latitude:</label>
-                            <input type="number" id="latitude" step="any" placeholder="Ex: -24.7856">
-                        </div>
-                        <div class="input-group">
-                            <label for="longitude">Longitude:</label>
-                            <input type="number" id="longitude" step="any" placeholder="Ex: -53.0982">
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="originName">Nome do ponto:</label>
-                        <input type="text" id="originName" placeholder="Nome para identificar este ponto">
-                    </div>
-
-                    <button class="btn" onclick="addOrigin()">Adicionar Ponto</button>
-                    <div class="error" id="errorMsg"></div>
-                </div>
 
                 <div class="form-section">
                     <button class="btn" onclick="generateMap()" id="generateBtn" disabled>
@@ -720,7 +659,7 @@
                 <div class="map-placeholder" id="mapPlaceholder">
                     <span style="font-size: 4em;">🗺️</span>
                     <h3>Mapa será exibido aqui</h3>
-                    <p>Adicione pontos de origem e clique em "Gerar Mapa de Rotas"</p>
+                    <p>Selecione as rotas desejadas e clique em "Gerar Mapa de Rotas"</p>
                 </div>
                 <div id="mapContainer" style="display: none;"></div>
             </div>
@@ -746,89 +685,13 @@
         let filteredOrigins = []; // Para armazenar origens filtradas
         let activeFilters = { turnos: [], cidades: [] }; // Filtros ativos
 
-        function toggleInputType() {
-            const inputType = document.getElementById('inputType').value;
-            const addressInputs = document.getElementById('addressInputs');
-            const coordsInputs = document.getElementById('coordsInputs');
-            
-            if (inputType === 'address') {
-                addressInputs.style.display = 'block';
-                coordsInputs.style.display = 'none';
-            } else {
-                addressInputs.style.display = 'none';
-                coordsInputs.style.display = 'block';
-            }
-            
-            clearError();
-        }
 
-        function clearError() {
-            document.getElementById('errorMsg').style.display = 'none';
-        }
 
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMsg');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
 
-        function addOrigin() {
-            clearError();
-            
-            const inputType = document.getElementById('inputType').value;
-            const originName = document.getElementById('originName').value.trim();
-            
-            if (!originName) {
-                showError('Por favor, informe um nome para o ponto');
-                return;
-            }
-            
-            let origin = { name: originName };
-            
-            if (inputType === 'address') {
-                const address = document.getElementById('address').value.trim();
-                if (!address) {
-                    showError('Por favor, informe o endereço');
-                    return;
-                }
-                origin.address = address;
-                origin.type = 'address';
-            } else {
-                const lat = parseFloat(document.getElementById('latitude').value);
-                const lon = parseFloat(document.getElementById('longitude').value);
-                
-                if (isNaN(lat) || isNaN(lon)) {
-                    showError('Por favor, informe coordenadas válidas');
-                    return;
-                }
-                
-                origin.lat = lat;
-                origin.lon = lon;
-                origin.type = 'coordinates';
-            }
-            
-            origins.push(origin);
-            updateOriginsList();
-            clearForm();
-            updateGenerateButton();
-        }
 
-        function removeOrigin(index) {
-            origins.splice(index, 1);
-            // Atualiza os índices das rotas selecionadas
-            const newSelectedRoutes = new Set();
-            selectedRoutes.forEach(selectedIndex => {
-                if (selectedIndex < index) {
-                    newSelectedRoutes.add(selectedIndex);
-                } else if (selectedIndex > index) {
-                    newSelectedRoutes.add(selectedIndex - 1);
-                }
-                // Se selectedIndex === index, não adiciona (remove a seleção)
-            });
-            selectedRoutes = newSelectedRoutes;
-            updateOriginsList();
-            updateGenerateButton();
-        }
+
+
+
 
         // Função para obter cidades disponíveis baseadas nos turnos selecionados
         function getAvailableCities(selectedTurnos) {
@@ -1036,12 +899,7 @@
             }).join('');
         }
 
-        function clearForm() {
-            document.getElementById('address').value = '';
-            document.getElementById('latitude').value = '';
-            document.getElementById('longitude').value = '';
-            document.getElementById('originName').value = '';
-        }
+
 
         function updateGenerateButton() {
             const generateBtn = document.getElementById('generateBtn');
@@ -1180,7 +1038,7 @@
 
         async function generateMap() {
             if (selectedRoutes.size === 0) {
-                showError('Selecione pelo menos uma rota para gerar o mapa.');
+                alert('Selecione pelo menos uma rota para gerar o mapa.');
                 return;
             }
             
@@ -1214,7 +1072,7 @@
                 
             } catch (error) {
                 console.error('Erro:', error);
-                showError('Erro ao gerar mapa. Verifique se o servidor está rodando.');
+                alert('Erro ao gerar mapa. Verifique se o servidor está rodando.');
             } finally {
                 loading.style.display = 'none';
                 generateBtn.disabled = false;
