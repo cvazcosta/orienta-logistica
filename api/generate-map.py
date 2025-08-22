@@ -18,9 +18,18 @@ class RouteVisualizer:
             'lon': -53.70939297263396,
             'address': 'Biopark, Edifício Charles Darwin - Avenida Max Planck, 3797 - Toledo, PR, 85920-025'
         }
+        # Cache para coordenadas geocodificadas
+        self.geocode_cache = {}
+        # Cache para rotas calculadas
+        self.route_cache = {}
     
     def geocode_address(self, address: str) -> Tuple[float, float]:
-        """Converte endereço em coordenadas usando Nominatim (OpenStreetMap)"""
+        """Geocodifica um endereço usando a API do Nominatim com cache"""
+        # Verifica se o endereço já está no cache
+        if address in self.geocode_cache:
+            print(f"DEBUG: Usando coordenadas do cache para: {address}")
+            return self.geocode_cache[address]
+            
         try:
             url = "https://nominatim.openstreetmap.org/search"
             params = {
@@ -30,11 +39,23 @@ class RouteVisualizer:
                 'countrycodes': 'br'  # Limita busca ao Brasil
             }
             
-            response = requests.get(url, params=params, timeout=10)
+            # Headers para identificar a aplicação
+            headers = {
+                'User-Agent': 'RouteVisualizer/1.0 (contact@example.com)'
+            }
+            
+            response = requests.get(url, params=params, headers=headers, timeout=10)
             data = response.json()
             
             if data:
-                return float(data[0]['lat']), float(data[0]['lon'])
+                lat = float(data[0]['lat'])
+                lon = float(data[0]['lon'])
+                
+                # Armazena no cache
+                self.geocode_cache[address] = (lat, lon)
+                print(f"DEBUG: Coordenadas geocodificadas e armazenadas no cache: {address} -> {lat}, {lon}")
+                
+                return lat, lon
             else:
                 raise Exception(f"Endereço não encontrado: {address}")
                 
@@ -42,7 +63,15 @@ class RouteVisualizer:
             raise Exception(f"Erro na geocodificação: {str(e)}")
     
     def get_route(self, start_lat: float, start_lon: float, end_lat: float, end_lon: float) -> dict:
-        """Obtém rota usando OSRM (Open Source Routing Machine)"""
+        """Obtém rota entre dois pontos usando OSRM com cache"""
+        # Cria chave única para o cache baseada nas coordenadas
+        cache_key = f"{start_lat:.6f},{start_lon:.6f}-{end_lat:.6f},{end_lon:.6f}"
+        
+        # Verifica se a rota já está no cache
+        if cache_key in self.route_cache:
+            print(f"DEBUG: Usando rota do cache para: {cache_key}")
+            return self.route_cache[cache_key]
+            
         try:
             url = f"http://router.project-osrm.org/route/v1/driving/{start_lon},{start_lat};{end_lon},{end_lat}"
             params = {
@@ -55,11 +84,17 @@ class RouteVisualizer:
             
             if data['code'] == 'Ok' and data['routes']:
                 route = data['routes'][0]
-                return {
+                route_info = {
                     'geometry': route['geometry']['coordinates'],
                     'distance': route['distance'] / 1000,  # Converte para km
                     'duration': route['duration'] / 60     # Converte para minutos
                 }
+                
+                # Armazena no cache
+                self.route_cache[cache_key] = route_info
+                print(f"DEBUG: Rota calculada e armazenada no cache: {cache_key}")
+                
+                return route_info
             else:
                 raise Exception("Rota não encontrada")
                 
