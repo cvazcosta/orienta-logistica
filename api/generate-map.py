@@ -44,7 +44,7 @@ class RouteVisualizer:
                 'User-Agent': 'RouteVisualizer/1.0 (contact@example.com)'
             }
             
-            response = requests.get(url, params=params, headers=headers, timeout=10)
+            response = requests.get(url, params=params, headers=headers, timeout=5)
             data = response.json()
             
             if data:
@@ -79,7 +79,7 @@ class RouteVisualizer:
                 'geometries': 'geojson'
             }
             
-            response = requests.get(url, params=params, timeout=15)
+            response = requests.get(url, params=params, timeout=8)
             data = response.json()
             
             if data['code'] == 'Ok' and data['routes']:
@@ -349,20 +349,31 @@ class handler(BaseHTTPRequestHandler):
             print(f"DEBUG: Iniciando processamento paralelo de {len(addresses)} endereços")
             start_time = time.time()
             
-            # Usar ThreadPoolExecutor para processamento paralelo
-            max_workers = min(10, len(addresses))  # Máximo 10 threads para evitar sobrecarga
-            with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                # Submeter todas as tarefas
-                future_to_address = {executor.submit(process_address, addr): addr for addr in addresses}
+            # Otimização: processar em lotes para evitar sobrecarga de API
+            batch_size = 5  # Processar 5 endereços por vez
+            max_workers = min(3, len(addresses))  # Reduzir threads para evitar rate limiting
+            
+            # Processar endereços em lotes
+            for i in range(0, len(addresses), batch_size):
+                batch = addresses[i:i + batch_size]
+                print(f"DEBUG: Processando lote {i//batch_size + 1} com {len(batch)} endereços")
                 
-                # Coletar resultados conforme completam
-                for future in as_completed(future_to_address):
-                    result = future.result()
-                    if result:
-                        if 'error' in result and 'address' in result:
-                            errors.append(result)
-                        else:
-                            origins.append(result)
+                with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                    # Submeter tarefas do lote atual
+                    future_to_address = {executor.submit(process_address, addr): addr for addr in batch}
+                    
+                    # Coletar resultados do lote
+                    for future in as_completed(future_to_address):
+                        result = future.result()
+                        if result:
+                            if 'error' in result and 'address' in result:
+                                errors.append(result)
+                            else:
+                                origins.append(result)
+                
+                # Pequena pausa entre lotes para evitar rate limiting
+                if i + batch_size < len(addresses):
+                    time.sleep(0.5)  # 500ms de pausa entre lotes
             
             processing_time = time.time() - start_time
             print(f"DEBUG: Processamento paralelo concluído em {processing_time:.2f}s")
