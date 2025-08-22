@@ -12,9 +12,9 @@ class RouteVisualizer:
         # Coordenadas do Biopark Educação - Toledo, PR
         self.destination = {
             'name': 'Biopark Educação - Toledo, PR',
-            'lat': -24.7136,
-            'lon': -53.7405,
-            'address': 'R. da Faculdade, 645 - Jardim La Salle, Toledo - PR, 85902-532'
+            'lat': -24.617465183385058,
+            'lon': -53.70939297263396,
+            'address': 'Biopark, Edifício Charles Darwin - Avenida Max Planck, 3797 - Toledo, PR, 85920-025'
         }
     
     def geocode_address(self, address: str) -> Tuple[float, float]:
