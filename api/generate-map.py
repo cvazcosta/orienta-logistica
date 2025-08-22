@@ -236,8 +236,19 @@ class handler(BaseHTTPRequestHandler):
                     continue
                     
                 try:
-                    # Geocodifica endereço
-                    lat, lon = visualizer.geocode_address(address)
+                    print(f"DEBUG: Tentando geocodificar: {address}")
+                    
+                    # Se o endereço já são coordenadas, usar diretamente
+                    if ',' in address and len(address.split(',')) == 2:
+                        try:
+                            lat, lon = map(float, address.split(','))
+                            print(f"DEBUG: Coordenadas extraídas: lat={lat}, lon={lon}")
+                        except ValueError:
+                            # Se não conseguir converter, geocodificar normalmente
+                            lat, lon = visualizer.geocode_address(address)
+                    else:
+                        # Geocodifica endereço
+                        lat, lon = visualizer.geocode_address(address)
                     
                     # Calcula rota
                     route_info = visualizer.get_route(
@@ -256,11 +267,22 @@ class handler(BaseHTTPRequestHandler):
                     }
                     
                     origins.append(origin_data)
+                    print(f"DEBUG: Origin adicionado com sucesso: {origin_data['address']}")
                     
                 except Exception as e:
+                    print(f"DEBUG: Erro na rota para {address}: {str(e)}")
                     # Se falhar, adiciona sem rota
                     try:
-                        lat, lon = visualizer.geocode_address(address)
+                        # Se o endereço já são coordenadas, usar diretamente
+                        if ',' in address and len(address.split(',')) == 2:
+                            try:
+                                lat, lon = map(float, address.split(','))
+                                print(f"DEBUG: Coordenadas extraídas (fallback): lat={lat}, lon={lon}")
+                            except ValueError:
+                                lat, lon = visualizer.geocode_address(address)
+                        else:
+                            lat, lon = visualizer.geocode_address(address)
+                            
                         distance = visualizer.calculate_distance(
                             lat, lon,
                             visualizer.destination['lat'], 
@@ -278,8 +300,10 @@ class handler(BaseHTTPRequestHandler):
                         }
                         
                         origins.append(origin_data)
+                        print(f"DEBUG: Origin adicionado sem rota: {origin_data['address']}")
                         
                     except Exception as geo_error:
+                        print(f"DEBUG: Erro crítico na geocodificação de {address}: {str(geo_error)}")
                         self.send_response(400)
                         self.send_header('Content-type', 'application/json')
                         self.send_header('Access-Control-Allow-Origin', '*')
