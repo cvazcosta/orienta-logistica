@@ -6,6 +6,8 @@ import json
 from typing import List, Tuple
 import time
 import urllib.parse
+import math
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class RouteVisualizer:
     def __init__(self):
@@ -229,11 +231,10 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(response).encode('utf-8'))
                 return
             
-            origins = []
-            
-            for i, address in enumerate(addresses):
+            # Função para processar cada endereço individualmente
+            def process_address(address):
                 if not address or not address.strip():
-                    continue
+                    return None
                     
                 try:
                     print(f"DEBUG: Tentando geocodificar: {address}")
@@ -266,8 +267,8 @@ class handler(BaseHTTPRequestHandler):
                         'route_geometry': route_info['geometry']
                     }
                     
-                    origins.append(origin_data)
-                    print(f"DEBUG: Origin adicionado com sucesso: {origin_data['address']}")
+                    print(f"DEBUG: Origin processado com sucesso: {origin_data['address']}")
+                    return origin_data
                     
                 except Exception as e:
                     print(f"DEBUG: Erro na rota para {address}: {str(e)}")
@@ -299,18 +300,48 @@ class handler(BaseHTTPRequestHandler):
                             'error': f"Rota não disponível: {str(e)}"
                         }
                         
-                        origins.append(origin_data)
-                        print(f"DEBUG: Origin adicionado sem rota: {origin_data['address']}")
+                        print(f"DEBUG: Origin processado sem rota: {origin_data['address']}")
+                        return origin_data
                         
                     except Exception as geo_error:
                         print(f"DEBUG: Erro crítico na geocodificação de {address}: {str(geo_error)}")
-                        self.send_response(400)
-                        self.send_header('Content-type', 'application/json')
-                        self.send_header('Access-Control-Allow-Origin', '*')
-                        self.end_headers()
-                        response = {'success': False, 'error': f"Erro no endereço '{address}': {str(geo_error)}"}
-                        self.wfile.write(json.dumps(response).encode('utf-8'))
-                        return
+                        return {'error': f"Erro no endereço '{address}': {str(geo_error)}", 'address': address}
+            
+            # Processamento paralelo dos endereços
+            origins = []
+            errors = []
+            
+            print(f"DEBUG: Iniciando processamento paralelo de {len(addresses)} endereços")
+            start_time = time.time()
+            
+            # Usar ThreadPoolExecutor para processamento paralelo
+            max_workers = min(10, len(addresses))  # Máximo 10 threads para evitar sobrecarga
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                # Submeter todas as tarefas
+                future_to_address = {executor.submit(process_address, addr): addr for addr in addresses}
+                
+                # Coletar resultados conforme completam
+                for future in as_completed(future_to_address):
+                    result = future.result()
+                    if result:
+                        if 'error' in result and 'address' in result:
+                            errors.append(result)
+                        else:
+                            origins.append(result)
+            
+            processing_time = time.time() - start_time
+            print(f"DEBUG: Processamento paralelo concluído em {processing_time:.2f}s")
+            
+            # Se houver erros críticos, retornar erro
+            if errors and not origins:
+                error_msg = "; ".join([err['error'] for err in errors[:3]])  # Mostrar apenas os 3 primeiros erros
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {'success': False, 'error': f'Erros de geocodificação: {error_msg}'}
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                return
             
             if not origins:
                 self.send_response(400)
