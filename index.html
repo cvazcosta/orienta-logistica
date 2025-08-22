@@ -200,14 +200,8 @@
         .origin-name {
             font-weight: 600;
             color: #2c3e50;
-            cursor: pointer;
-            transition: color 0.3s ease;
             font-size: 13px;
             line-height: 1.3;
-        }
-
-        .origin-name:hover {
-            color: #667eea;
         }
 
         .card-actions {
@@ -880,18 +874,18 @@
                 // Encontra o índice original da origem
                 const originalIndex = origins.findIndex(o => o === origin);
                 return `
-                    <div class="origin-card ${selectedRoutes.has(originalIndex) ? 'selected' : ''}">
+                    <div class="origin-card ${selectedRoutes.has(originalIndex) ? 'selected' : ''}" onclick="toggleRoute(${originalIndex})">
                         <div class="card-header">
                             <div class="card-left">
                                 <input type="checkbox" class="route-checkbox" 
                                        ${selectedRoutes.has(originalIndex) ? 'checked' : ''}
-                                       onchange="toggleRoute(${originalIndex})">
-                                <span class="origin-name" onclick="showRouteInfo(${originalIndex})">
+                                       onchange="toggleRoute(${originalIndex})" onclick="event.stopPropagation()">
+                                <span class="origin-name">
                                      ${origin.name}${origin.info ? ` | ${origin.info.turno} | ${origin.info.passageiros} alunos` : ''}
                                  </span>
                             </div>
                             <div class="card-actions">
-                                ${origin.info ? `<button class="info-btn" onclick="showRouteInfo(${originalIndex})">Info</button>` : ''}
+                                ${origin.info ? `<button class="info-btn" onclick="event.stopPropagation(); showRouteInfo(${originalIndex})">Info</button>` : ''}
                             </div>
                         </div>
                     </div>

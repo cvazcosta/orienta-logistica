@@ -155,13 +155,13 @@ class RouteVisualizer:
                 folium.Marker(
                     [origin['lat'], origin['lon']],
                     popup=folium.Popup(
-                        f"<b>Origem {i+1}</b><br>"
-                        f"<b>Endereço:</b> {origin['address']}<br>"
+                        f"<b>{origin.get('name', f'Origem {i+1}')}</b><br>"
+                        f"<b>Passageiros:</b> {origin.get('passageiros', 'N/A')}<br>"
                         f"<b>Distância:</b> {origin.get('distance', 'N/A'):.1f} km<br>"
                         f"<b>Tempo:</b> {origin.get('duration', 'N/A'):.0f} min",
                         max_width=300
                     ),
-                    tooltip=f"Origem {i+1}",
+                    tooltip=origin.get('name', f"Origem {i+1}"),
                     icon=folium.Icon(color=color, icon='home', prefix='fa')
                 ).add_to(m)
                 
@@ -235,56 +235,60 @@ class handler(BaseHTTPRequestHandler):
             origins_data = data[origins_key]
             print(f"DEBUG: origins_data: {origins_data}")
             
-            # Se for selectedOrigins, é uma lista de strings; se for origins, é uma lista de objetos
+            # Trabalhar diretamente com os objetos de origem
             if origins_key == 'selectedOrigins':
-                addresses = origins_data  # Lista direta de endereços
+                # Se for selectedOrigins, converter para objetos simples
+                origins_to_process = [{'address': addr} for addr in origins_data]
             else:
-                # Para origins, verificar se tem address ou usar coordenadas
-                addresses = []
-                for origin in origins_data:
-                    if origin.get('address'):
-                        addresses.append(origin['address'])
-                    elif origin.get('lat') and origin.get('lon'):
-                        # Usar coordenadas como fallback
-                        addresses.append(f"{origin['lat']},{origin['lon']}")
-                    elif origin.get('name'):
-                        # Usar nome como fallback
-                        addresses.append(origin['name'])
+                # Para origins, usar os objetos completos
+                origins_to_process = origins_data
             
-            print(f"DEBUG: addresses processados: {addresses}")
+            print(f"DEBUG: origins_to_process: {len(origins_to_process)} objetos")
             
-            # Filtrar endereços None ou vazios
-            addresses = [addr for addr in addresses if addr and str(addr).strip()]
+            # Filtrar objetos válidos
+            valid_origins = []
+            for origin in origins_to_process:
+                if origin.get('address') or (origin.get('lat') and origin.get('lon')) or origin.get('name'):
+                    valid_origins.append(origin)
             
-            if not addresses or len(addresses) == 0:
-                print(f"DEBUG: Falha na validação de endereços - addresses: {addresses}")
+            if not valid_origins or len(valid_origins) == 0:
+                print(f"DEBUG: Falha na validação - nenhuma origem válida encontrada")
                 self.send_response(400)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                response = {'success': False, 'error': 'Pelo menos um endereço válido deve ser fornecido'}
+                response = {'success': False, 'error': 'Pelo menos uma origem válida deve ser fornecida'}
                 self.wfile.write(json.dumps(response).encode('utf-8'))
                 return
             
-            # Função para processar cada endereço individualmente
-            def process_address(address):
-                if not address or not address.strip():
+            # Função para processar cada origem individualmente
+            def process_origin(origin_obj):
+                if not origin_obj:
                     return None
                     
                 try:
-                    print(f"DEBUG: Tentando geocodificar: {address}")
+                    # Extrair informações da origem
+                    name = origin_obj.get('name', 'Origem')
+                    address = origin_obj.get('address')
+                    lat = origin_obj.get('lat')
+                    lon = origin_obj.get('lon')
+                    info = origin_obj.get('info', {})
                     
-                    # Se o endereço já são coordenadas, usar diretamente
-                    if ',' in address and len(address.split(',')) == 2:
-                        try:
-                            lat, lon = map(float, address.split(','))
-                            print(f"DEBUG: Coordenadas extraídas: lat={lat}, lon={lon}")
-                        except ValueError:
-                            # Se não conseguir converter, geocodificar normalmente
-                            lat, lon = visualizer.geocode_address(address)
-                    else:
-                        # Geocodifica endereço
+                    print(f"DEBUG: Processando origem: {name}")
+                    
+                    # Determinar coordenadas
+                    if lat and lon:
+                        # Usar coordenadas existentes
+                        lat, lon = float(lat), float(lon)
+                        print(f"DEBUG: Usando coordenadas existentes: lat={lat}, lon={lon}")
+                    elif address:
+                        # Geocodificar endereço
                         lat, lon = visualizer.geocode_address(address)
+                        print(f"DEBUG: Coordenadas geocodificadas: lat={lat}, lon={lon}")
+                    else:
+                        # Tentar geocodificar pelo nome
+                        lat, lon = visualizer.geocode_address(name)
+                        print(f"DEBUG: Coordenadas geocodificadas pelo nome: lat={lat}, lon={lon}")
                     
                     # Calcula rota
                     route_info = visualizer.get_route(
@@ -294,30 +298,34 @@ class handler(BaseHTTPRequestHandler):
                     )
                     
                     origin_data = {
-                        'address': address,
+                        'name': name,
+                        'address': address or f"{lat}, {lon}",
                         'lat': lat,
                         'lon': lon,
                         'distance': route_info['distance'],
                         'duration': route_info['duration'],
-                        'route_geometry': route_info['geometry']
+                        'route_geometry': route_info['geometry'],
+                        'passageiros': info.get('passageiros', 'N/A')
                     }
                     
-                    print(f"DEBUG: Origin processado com sucesso: {origin_data['address']}")
+                    # Preservar outras informações se existirem
+                    if info:
+                        origin_data['info'] = info
+                    
+                    print(f"DEBUG: Origin processado com sucesso: {name}")
                     return origin_data
                     
                 except Exception as e:
-                    print(f"DEBUG: Erro na rota para {address}: {str(e)}")
+                    print(f"DEBUG: Erro na rota para {name}: {str(e)}")
                     # Se falhar, adiciona sem rota
                     try:
-                        # Se o endereço já são coordenadas, usar diretamente
-                        if ',' in address and len(address.split(',')) == 2:
-                            try:
-                                lat, lon = map(float, address.split(','))
-                                print(f"DEBUG: Coordenadas extraídas (fallback): lat={lat}, lon={lon}")
-                            except ValueError:
-                                lat, lon = visualizer.geocode_address(address)
-                        else:
+                        # Tentar obter coordenadas para fallback
+                        if lat and lon:
+                            lat, lon = float(lat), float(lon)
+                        elif address:
                             lat, lon = visualizer.geocode_address(address)
+                        else:
+                            lat, lon = visualizer.geocode_address(name)
                             
                         distance = visualizer.calculate_distance(
                             lat, lon,
@@ -326,53 +334,59 @@ class handler(BaseHTTPRequestHandler):
                         )
                         
                         origin_data = {
-                            'address': address,
+                            'name': name,
+                            'address': address or f"{lat}, {lon}",
                             'lat': lat,
                             'lon': lon,
                             'distance': distance,
                             'duration': distance * 1.5,  # Estimativa: 1.5 min por km
                             'route_geometry': None,
+                            'passageiros': info.get('passageiros', 'N/A'),
                             'error': f"Rota não disponível: {str(e)}"
                         }
                         
-                        print(f"DEBUG: Origin processado sem rota: {origin_data['address']}")
+                        # Preservar outras informações se existirem
+                        if info:
+                            origin_data['info'] = info
+                        
+                        print(f"DEBUG: Origin processado sem rota: {name}")
                         return origin_data
                         
                     except Exception as geo_error:
-                        print(f"DEBUG: Erro crítico na geocodificação de {address}: {str(geo_error)}")
-                        return {'error': f"Erro no endereço '{address}': {str(geo_error)}", 'address': address}
+                        print(f"DEBUG: Erro crítico na geocodificação de {name}: {str(geo_error)}")
+                        return {'error': f"Erro na origem '{name}': {str(geo_error)}", 'name': name}
             
-            # Processamento paralelo dos endereços
+            # Processamento paralelo das origens
             origins = []
             errors = []
             
-            print(f"DEBUG: Iniciando processamento paralelo de {len(addresses)} endereços")
+            print(f"DEBUG: Iniciando processamento paralelo de {len(valid_origins)} origens")
             start_time = time.time()
             
             # Otimização: processar em lotes para evitar sobrecarga de API
-            batch_size = 5  # Processar 5 endereços por vez
-            max_workers = min(3, len(addresses))  # Reduzir threads para evitar rate limiting
+            batch_size = 5  # Processar 5 origens por vez
+            max_workers = min(3, len(valid_origins))  # Reduzir threads para evitar rate limiting
             
-            # Processar endereços em lotes
-            for i in range(0, len(addresses), batch_size):
-                batch = addresses[i:i + batch_size]
-                print(f"DEBUG: Processando lote {i//batch_size + 1} com {len(batch)} endereços")
+            # Processar origens em lotes
+            for i in range(0, len(valid_origins), batch_size):
+                batch = valid_origins[i:i + batch_size]
+                print(f"DEBUG: Processando lote {i//batch_size + 1} com {len(batch)} origens")
                 
                 with ThreadPoolExecutor(max_workers=max_workers) as executor:
                     # Submeter tarefas do lote atual
-                    future_to_address = {executor.submit(process_address, addr): addr for addr in batch}
+                    future_to_origin = {executor.submit(process_origin, origin): origin for origin in batch}
                     
                     # Coletar resultados do lote
-                    for future in as_completed(future_to_address):
+                    for future in as_completed(future_to_origin):
                         result = future.result()
                         if result:
-                            if 'error' in result and 'address' in result:
+                            if 'error' in result and 'name' in result:
                                 errors.append(result)
                             else:
                                 origins.append(result)
                 
                 # Pequena pausa entre lotes para evitar rate limiting
-                if i + batch_size < len(addresses):
+                if i + batch_size < len(valid_origins):
                     time.sleep(0.5)  # 500ms de pausa entre lotes
             
             processing_time = time.time() - start_time
@@ -394,7 +408,7 @@ class handler(BaseHTTPRequestHandler):
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                response = {'success': False, 'error': 'Nenhum endereço válido foi processado'}
+                response = {'success': False, 'error': 'Nenhuma origem válida foi processada'}
                 self.wfile.write(json.dumps(response).encode('utf-8'))
                 return
             
