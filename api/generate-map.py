@@ -207,7 +207,7 @@ class handler(BaseHTTPRequestHandler):
             origins = []
             
             for i, address in enumerate(addresses):
-                if not address.strip():
+                if not address or not address.strip():
                     continue
                     
                 try:
