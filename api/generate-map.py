@@ -1,14 +1,11 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from http.server import BaseHTTPRequestHandler
 import os
 import folium
 import requests
 import json
 from typing import List, Tuple
 import time
-
-app = Flask(__name__)
-CORS(app)  # Permite requisições do frontend
+import urllib.parse
 
 class RouteVisualizer:
     def __init__(self):
@@ -156,60 +153,69 @@ class RouteVisualizer:
 # Instancia o visualizador
 visualizer = RouteVisualizer()
 
-@app.route('/generate-map', methods=['POST'])
-def generate_map():
-    """Endpoint para gerar mapa com rotas"""
-    try:
-        data = request.get_json()
-        
-        if not data or 'origins' not in data:
-            return jsonify({
-                'success': False,
-                'error': 'Lista de origens é obrigatória'
-            }), 400
-        
-        origins_data = data['origins']
-        addresses = [origin['address'] for origin in origins_data]
-        
-        if not addresses or len(addresses) == 0:
-            return jsonify({
-                'success': False,
-                'error': 'Pelo menos um endereço deve ser fornecido'
-            }), 400
-        
-        origins = []
-        
-        for i, address in enumerate(addresses):
-            if not address.strip():
-                continue
-                
+class handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        try:
+            # Verificar se é a rota correta
+            if self.path != '/api/generate-map':
+                self.send_error(404, 'Not Found')
+                return
+            
+            # Ler o corpo da requisição
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            
+            # Parse do JSON
             try:
-                # Geocodifica endereço
-                lat, lon = visualizer.geocode_address(address)
-                
-                # Calcula rota
-                route_info = visualizer.get_route(
-                    lat, lon,
-                    visualizer.destination['lat'], 
-                    visualizer.destination['lon']
-                )
-                
-                origin_data = {
-                    'address': address,
-                    'lat': lat,
-                    'lon': lon,
-                    'distance': route_info['distance'],
-                    'duration': route_info['duration'],
-                    'route_geometry': route_info['geometry']
-                }
-                
-                origins.append(origin_data)
-                
-            except Exception as e:
-                # Se falhar, adiciona sem rota
+                data = json.loads(post_data.decode('utf-8'))
+            except json.JSONDecodeError:
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {'success': False, 'error': 'JSON inválido'}
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                return
+            
+            # Validar dados - aceita tanto 'origins' quanto 'selectedOrigins'
+            origins_key = 'selectedOrigins' if 'selectedOrigins' in data else 'origins'
+            if not data or origins_key not in data:
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {'success': False, 'error': 'Lista de origens é obrigatória'}
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                return
+            
+            origins_data = data[origins_key]
+            # Se for selectedOrigins, é uma lista de strings; se for origins, é uma lista de objetos
+            if origins_key == 'selectedOrigins':
+                addresses = origins_data  # Lista direta de endereços
+            else:
+                addresses = [origin['address'] for origin in origins_data]  # Lista de objetos
+            
+            if not addresses or len(addresses) == 0:
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {'success': False, 'error': 'Pelo menos um endereço deve ser fornecido'}
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                return
+            
+            origins = []
+            
+            for i, address in enumerate(addresses):
+                if not address.strip():
+                    continue
+                    
                 try:
+                    # Geocodifica endereço
                     lat, lon = visualizer.geocode_address(address)
-                    distance = visualizer.calculate_distance(
+                    
+                    # Calcula rota
+                    route_info = visualizer.get_route(
                         lat, lon,
                         visualizer.destination['lat'], 
                         visualizer.destination['lon']
@@ -219,51 +225,100 @@ def generate_map():
                         'address': address,
                         'lat': lat,
                         'lon': lon,
-                        'distance': distance,
-                        'duration': distance * 1.5,  # Estimativa: 1.5 min por km
-                        'route_geometry': None,
-                        'error': f"Rota não disponível: {str(e)}"
+                        'distance': route_info['distance'],
+                        'duration': route_info['duration'],
+                        'route_geometry': route_info['geometry']
                     }
                     
                     origins.append(origin_data)
                     
-                except Exception as geo_error:
-                    return jsonify({
-                        'success': False,
-                        'error': f"Erro no endereço '{address}': {str(geo_error)}"
-                    }), 400
-        
-        if not origins:
-            return jsonify({
-                'success': False,
-                'error': 'Nenhum endereço válido foi processado'
-            }), 400
-        
-        # Gera mapa HTML
-        map_html = visualizer.create_map_html(origins)
-        
-        return jsonify({
-            'success': True,
-            'mapHtml': map_html,
-            'origins': origins,
-            'destination': visualizer.destination
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': f"Erro interno: {str(e)}"
-        }), 500
-
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({
-        'status': 'OK',
-        'service': 'Route Visualizer API',
-        'destination': visualizer.destination
-    })
-
-# Função handler para Vercel (ponto de entrada da função serverless)
-def handler(request):
-    """Função handler para Vercel - ponto de entrada da função serverless"""
-    return app(request.environ, lambda status, headers: None)
+                except Exception as e:
+                    # Se falhar, adiciona sem rota
+                    try:
+                        lat, lon = visualizer.geocode_address(address)
+                        distance = visualizer.calculate_distance(
+                            lat, lon,
+                            visualizer.destination['lat'], 
+                            visualizer.destination['lon']
+                        )
+                        
+                        origin_data = {
+                            'address': address,
+                            'lat': lat,
+                            'lon': lon,
+                            'distance': distance,
+                            'duration': distance * 1.5,  # Estimativa: 1.5 min por km
+                            'route_geometry': None,
+                            'error': f"Rota não disponível: {str(e)}"
+                        }
+                        
+                        origins.append(origin_data)
+                        
+                    except Exception as geo_error:
+                        self.send_response(400)
+                        self.send_header('Content-type', 'application/json')
+                        self.send_header('Access-Control-Allow-Origin', '*')
+                        self.end_headers()
+                        response = {'success': False, 'error': f"Erro no endereço '{address}': {str(geo_error)}"}
+                        self.wfile.write(json.dumps(response).encode('utf-8'))
+                        return
+            
+            if not origins:
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {'success': False, 'error': 'Nenhum endereço válido foi processado'}
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                return
+            
+            # Gera mapa HTML
+            map_html = visualizer.create_map_html(origins)
+            
+            # Resposta de sucesso
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            response = {
+                'success': True,
+                'mapHtml': map_html,
+                'origins': origins,
+                'destination': visualizer.destination
+            }
+            
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+            
+        except Exception as e:
+            print(f"Erro ao gerar mapa: {str(e)}")
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {'success': False, 'error': f'Erro interno: {str(e)}'}
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+    
+    def do_GET(self):
+        # Health check
+        if self.path == '/api/health':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'status': 'OK',
+                'service': 'Route Visualizer API',
+                'destination': visualizer.destination
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        else:
+            self.send_error(404, 'Not Found')
+    
+    def do_OPTIONS(self):
+        # Suporte para CORS preflight
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()

@@ -1,21 +1,9 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/generate-map.py": {
-      "runtime": "python3.9"
+    "api/**/*.py": {
+      "memory": 1024,
+      "maxDuration": 30
     }
-  },
-  "routes": [
-    {
-      "src": "/api/generate-map",
-      "dest": "/api/generate-map"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/(.*\\.(html|css|js|json|png|jpg|jpeg|gif|svg|ico))",
-      "dest": "/$1"
-    }
-  ]
+  }
 }
