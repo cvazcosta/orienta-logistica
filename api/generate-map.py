@@ -168,7 +168,10 @@ class handler(BaseHTTPRequestHandler):
             # Parse do JSON
             try:
                 data = json.loads(post_data.decode('utf-8'))
-            except json.JSONDecodeError:
+                print(f"DEBUG: Dados recebidos: {data}")
+            except json.JSONDecodeError as e:
+                print(f"DEBUG: Erro de JSON: {str(e)}")
+                print(f"DEBUG: Dados brutos: {post_data.decode('utf-8')}")
                 self.send_response(400)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
@@ -179,7 +182,11 @@ class handler(BaseHTTPRequestHandler):
             
             # Validar dados - aceita tanto 'origins' quanto 'selectedOrigins'
             origins_key = 'selectedOrigins' if 'selectedOrigins' in data else 'origins'
+            print(f"DEBUG: Chave encontrada: {origins_key}")
+            print(f"DEBUG: Chaves disponíveis: {list(data.keys()) if data else 'None'}")
+            
             if not data or origins_key not in data:
+                print(f"DEBUG: Falha na validação - data: {bool(data)}, origins_key in data: {origins_key in data if data else False}")
                 self.send_response(400)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
@@ -189,13 +196,18 @@ class handler(BaseHTTPRequestHandler):
                 return
             
             origins_data = data[origins_key]
+            print(f"DEBUG: origins_data: {origins_data}")
+            
             # Se for selectedOrigins, é uma lista de strings; se for origins, é uma lista de objetos
             if origins_key == 'selectedOrigins':
                 addresses = origins_data  # Lista direta de endereços
             else:
                 addresses = [origin['address'] for origin in origins_data]  # Lista de objetos
             
+            print(f"DEBUG: addresses processados: {addresses}")
+            
             if not addresses or len(addresses) == 0:
+                print(f"DEBUG: Falha na validação de endereços - addresses: {addresses}")
                 self.send_response(400)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
