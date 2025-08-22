@@ -202,9 +202,22 @@ class handler(BaseHTTPRequestHandler):
             if origins_key == 'selectedOrigins':
                 addresses = origins_data  # Lista direta de endereços
             else:
-                addresses = [origin['address'] for origin in origins_data]  # Lista de objetos
+                # Para origins, verificar se tem address ou usar coordenadas
+                addresses = []
+                for origin in origins_data:
+                    if origin.get('address'):
+                        addresses.append(origin['address'])
+                    elif origin.get('lat') and origin.get('lon'):
+                        # Usar coordenadas como fallback
+                        addresses.append(f"{origin['lat']},{origin['lon']}")
+                    elif origin.get('name'):
+                        # Usar nome como fallback
+                        addresses.append(origin['name'])
             
             print(f"DEBUG: addresses processados: {addresses}")
+            
+            # Filtrar endereços None ou vazios
+            addresses = [addr for addr in addresses if addr and str(addr).strip()]
             
             if not addresses or len(addresses) == 0:
                 print(f"DEBUG: Falha na validação de endereços - addresses: {addresses}")
@@ -212,7 +225,7 @@ class handler(BaseHTTPRequestHandler):
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                response = {'success': False, 'error': 'Pelo menos um endereço deve ser fornecido'}
+                response = {'success': False, 'error': 'Pelo menos um endereço válido deve ser fornecido'}
                 self.wfile.write(json.dumps(response).encode('utf-8'))
                 return
             
