@@ -856,5 +856,44 @@
             "passageiros": 14,
             "turno": "Noite"
         }
-    }
+    },
+    {
+        "name": "Toledo - Premen",
+        "lat": -24.722484063424194,
+        "lon": -53.75166534472113,
+        "type": "coordinates",
+        "info": {
+          "data": "03/10/2025",
+          "horarioSaida": "07:30",
+          "horarioRetorno": "11:00",
+          "passageiros": 105,
+          "turno": "Manhã"
+        }
+      },
+      {
+        "name": "Toledo - Premen",
+        "lat": -24.722484063424194,
+        "lon": -53.75166534472113,
+        "type": "coordinates",
+        "info": {
+          "data": "03/10/2025",
+          "horarioSaida": "13:00",
+          "horarioRetorno": "16:00",
+          "passageiros": 71,
+          "turno": "Tarde"
+        }
+      },
+      {
+        "name": "Toledo - Premen",
+        "lat": -24.722484063424194,
+        "lon": -53.75166534472113,
+        "type": "coordinates",
+        "info": {
+          "data": "03/10/2025",
+          "horarioSaida": "13:00",
+          "horarioRetorno": "16:00",
+          "passageiros": 17,
+          "turno": "Noite"
+        }
+      }
 ]
