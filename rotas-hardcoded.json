@@ -362,20 +362,7 @@
             "passageiros": 44,
             "turno": "Manhã"
         }
-    },
-    {
-        "name": "Toledo - Jardim Porto Alegre",
-        "lat": -24.72147208,
-        "lon": -53.72296067,
-        "type": "coordinates",
-        "info": {
-            "data": "03/10/2025",
-            "horarioSaida": "07:30",
-            "horarioRetorno": "11:00",
-            "passageiros": 23,
-            "turno": "Manhã"
-        }
-    },
+    },    
     {
         "name": "Toledo - Esperança Favaretto Covatti",
         "lat": -24.75005541,
@@ -650,19 +637,6 @@
         }
     },
     {
-        "name": "Maripá - Pio XII",
-        "lat": -24.42116411,
-        "lon": -53.82908073,
-        "type": "coordinates",
-        "info": {
-            "data": "03/10/2025",
-            "horarioSaida": "07:30",
-            "horarioRetorno": "11:00",
-            "passageiros": 32,
-            "turno": "Manhã"
-        }
-    },
-    {
         "name": "Maripá - Castro Alves - Pérola Independente",
         "lat": -24.53170259,
         "lon": -53.73610272,
@@ -776,19 +750,6 @@
             "horarioSaida": "19:00",
             "horarioRetorno": "21:00",
             "passageiros": 23,
-            "turno": "Noite"
-        }
-    },
-    {
-        "name": "Toledo - Jardim Porto Alegre",
-        "lat": -24.72147208,
-        "lon": -53.72296067,
-        "type": "coordinates",
-        "info": {
-            "data": "03/10/2025",
-            "horarioSaida": "19:00",
-            "horarioRetorno": "21:00",
-            "passageiros": 9,
             "turno": "Noite"
         }
     },
